@@ -1,0 +1,24 @@
+{
+  "name": "asset-tag-device-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "apps/asset-tag-device/app.mjs",
+  "engines": {
+    "node": ">=20.5.1",
+    "npm": ">=9.8.0"
+  },
+  "type": "module",
+  "scripts": {
+    "start": "node app.mjs",
+    "reset": "yarn clean && yarn",
+    "clean": "rimraf node_modules",
+    "prep-build": "",
+    "preversion": "",
+    "version": "",
+    "postversion": ""
+  },
+  "dependencies": {
+    "aws-iot-device-sdk": "^2.2.15"
+  },
+  "license": "UNLICENSED"
+}
