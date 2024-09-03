@@ -16,6 +16,8 @@ const device = awsIot.device({
     clientId: "asset-tag-1",
     host: "a2ndfre2pmsyjx-ats.iot.us-east-1.amazonaws.com"
 });
+
+let i = 0;
 //
 // Device is an instance returned by mqtt.Client(), see mqtt.js for full
 // documentation.
@@ -24,7 +26,12 @@ device
     .on('connect', function () {
         console.log('connect');
         device.subscribe('topic_1');
-        device.publish('topic_2', JSON.stringify({test_data: 1}));
+        setInterval(() => {
+            i += 1;
+            device.publish('topic_2', JSON.stringify({device_id: 1, x: 0, y: 0, z: 0, location: 1, cnt: i}));
+            console.log('publish ', i);
+        }, 500);
+
     });
 
 device
