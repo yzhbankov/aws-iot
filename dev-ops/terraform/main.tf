@@ -5,7 +5,7 @@ resource "aws_s3_bucket" "firehose_destination_bucket" {
 # Kinesis Firehose delivery stream
 resource "aws_kinesis_firehose_delivery_stream" "firehose_stream" {
   name        = "${terraform.workspace}-yz-firehose-stream"
-  destination = "s3"
+  destination = "extended_s3"
 
   extended_s3_configuration {
     role_arn           = aws_iam_role.firehose_delivery_role.arn
