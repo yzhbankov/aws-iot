@@ -53,3 +53,17 @@ resource "aws_iam_role" "lambda_execution_role" {
     }]
   })
 }
+
+resource "aws_iam_policy" "custom_lambda_policy" {
+  name = "CustomLambdaPolicy"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action   = ["lambda:*"],
+        Effect   = "Allow",
+        Resource = "*"
+      }
+    ]
+  })
+}

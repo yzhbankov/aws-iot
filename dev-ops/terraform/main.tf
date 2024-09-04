@@ -2,16 +2,21 @@ resource "aws_s3_bucket" "firehose_destination_bucket" {
   bucket = "${terraform.workspace}-yz-iot-destination"
 }
 
+resource "aws_iam_role_policy_attachment" "lambda_s3_policy_attachment" {
+  role       = aws_iam_role.lambda_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}
+
 # Kinesis Firehose delivery stream
 resource "aws_kinesis_firehose_delivery_stream" "firehose_stream" {
   name        = "${terraform.workspace}-yz-firehose-stream"
-  destination = "s3"
+  destination = "extended_s3"
 
   extended_s3_configuration {
     role_arn           = aws_iam_role.firehose_delivery_role.arn
     bucket_arn         = aws_s3_bucket.firehose_destination_bucket.arn
-    buffer_size        = 5
-    buffer_interval    = 300
+    buffering_size     = 5
+    buffering_interval = 300
     compression_format = "GZIP"
 
     cloudwatch_logging_options {
@@ -57,11 +62,6 @@ resource "aws_iam_role_policy_attachment" "firehose_s3_lambda_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 }
 
-resource "aws_iam_role_policy_attachment" "firehose_lambda_policy" {
-  role       = aws_iam_role.firehose_delivery_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AWSLambdaFullAccess"
-}
-
 # IoT Core Rule
 resource "aws_iot_topic_rule" "iot_to_firehose_rule" {
   name        = "IoTToFirehoseRule"
@@ -96,4 +96,9 @@ resource "aws_iam_role" "iot_kinesis_role" {
 resource "aws_iam_role_policy_attachment" "iot_kinesis_policy" {
   role       = aws_iam_role.iot_kinesis_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonKinesisFirehoseFullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "firehose_lambda_policy" {
+  role       = aws_iam_role.firehose_delivery_role.name
+  policy_arn = aws_iam_policy.custom_lambda_policy.arn
 }
