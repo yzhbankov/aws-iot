@@ -62,11 +62,6 @@ resource "aws_iam_role_policy_attachment" "firehose_s3_lambda_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 }
 
-resource "aws_iam_role_policy_attachment" "firehose_lambda_policy" {
-  role       = aws_iam_role.firehose_delivery_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AWSLambdaFullAccess"
-}
-
 # IoT Core Rule
 resource "aws_iot_topic_rule" "iot_to_firehose_rule" {
   name        = "IoTToFirehoseRule"
@@ -101,4 +96,9 @@ resource "aws_iam_role" "iot_kinesis_role" {
 resource "aws_iam_role_policy_attachment" "iot_kinesis_policy" {
   role       = aws_iam_role.iot_kinesis_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonKinesisFirehoseFullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "firehose_lambda_policy" {
+  role       = aws_iam_role.firehose_delivery_role.name
+  policy_arn = aws_iam_policy.custom_lambda_policy.arn
 }
