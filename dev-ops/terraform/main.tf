@@ -2,6 +2,11 @@ resource "aws_s3_bucket" "firehose_destination_bucket" {
   bucket = "${terraform.workspace}-yz-iot-destination"
 }
 
+resource "aws_iam_role_policy_attachment" "lambda_s3_policy_attachment" {
+  role       = aws_iam_role.lambda_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}
+
 # Kinesis Firehose delivery stream
 resource "aws_kinesis_firehose_delivery_stream" "firehose_stream" {
   name        = "${terraform.workspace}-yz-firehose-stream"
