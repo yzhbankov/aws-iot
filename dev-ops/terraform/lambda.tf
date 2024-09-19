@@ -65,8 +65,8 @@ resource "aws_iam_policy" "custom_lambda_policy" {
         Resource = "*"
       },
       {
-        Effect = "Allow",
-        Action = "logs:CreateLogGroup",
+        Effect   = "Allow",
+        Action   = "logs:CreateLogGroup",
         Resource = "arn:aws:logs:*:*:*"
       },
       {
