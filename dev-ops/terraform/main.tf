@@ -49,6 +49,42 @@ resource "aws_iam_role" "firehose_delivery_role" {
       }
     }]
   })
+
+  # Inline policy to add S3 and Lambda permissions
+  inline_policy {
+    name = "firehose-s3-lambda-policy"
+
+    policy = jsonencode({
+      Version = "2012-10-17",
+      Statement = [
+        {
+          Sid    = "",
+          Effect = "Allow",
+          Action = [
+            "s3:AbortMultipartUpload",
+            "s3:GetBucketLocation",
+            "s3:GetObject",
+            "s3:ListBucket",
+            "s3:ListBucketMultipartUploads",
+            "s3:PutObject"
+          ],
+          Resource = [
+            aws_s3_bucket.firehose_destination_bucket.arn,
+            "${aws_s3_bucket.firehose_destination_bucket.arn}/*"
+          ]
+        },
+        {
+          Sid    = "",
+          Effect = "Allow",
+          Action = [
+            "lambda:InvokeFunction",
+            "lambda:GetFunctionConfiguration"
+          ],
+          Resource = "${aws_lambda_function.firehose_transform_lambda.arn}:$LATEST"
+        }
+      ]
+    })
+  }
 }
 
 # IoT Core Rule
