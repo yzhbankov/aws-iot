@@ -63,7 +63,26 @@ resource "aws_iam_policy" "custom_lambda_policy" {
         Action   = ["lambda:*"],
         Effect   = "Allow",
         Resource = "*"
+      },
+      {
+        Effect = "Allow",
+        Action = "logs:CreateLogGroup",
+        Resource = "arn:aws:logs:*:*:*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        Resource = "arn:aws:logs:*:*:log-group:/aws/lambda/*"
       }
     ]
   })
+}
+
+# Attach the custom policy to the Lambda execution role
+resource "aws_iam_role_policy_attachment" "lambda_policy_attachment" {
+  role       = aws_iam_role.lambda_execution_role.name
+  policy_arn = aws_iam_policy.custom_lambda_policy.arn
 }
