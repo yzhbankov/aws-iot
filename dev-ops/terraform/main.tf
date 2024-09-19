@@ -12,7 +12,6 @@ resource "aws_kinesis_firehose_delivery_stream" "firehose_stream" {
     bucket_arn         = aws_s3_bucket.firehose_destination_bucket.arn
     buffering_size     = 5
     buffering_interval = 300
-    compression_format = "GZIP"
 
     cloudwatch_logging_options {
       enabled         = true
