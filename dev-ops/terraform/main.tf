@@ -163,3 +163,23 @@ resource "aws_iot_policy_attachment" "iot_policy_attachment" {
   target = aws_iot_certificate.iot_certificate.arn
 }
 
+# Upload IoT certificate to S3
+resource "aws_s3_object" "iot_certificate" {
+  bucket  = aws_s3_bucket.firehose_destination_bucket.bucket
+  key     = "certificates/iot_certificate.pem"
+  content = aws_iot_certificate.iot_certificate.certificate_pem
+}
+
+# Upload IoT private key to S3 (assuming the key is stored locally)
+resource "aws_s3_object" "iot_private_key" {
+  bucket = aws_s3_bucket.firehose_destination_bucket.bucket
+  key    = "certificates/iot_private_key.pem"
+  source = "${path.module}/private-key.pem" # Replace with your actual key path
+}
+
+# Upload root CA certificate to S3 (assuming the CA is stored locally)
+resource "aws_s3_object" "iot_root_ca" {
+  bucket = aws_s3_bucket.firehose_destination_bucket.bucket
+  key    = "certificates/root_ca.pem"
+  source = "${path.module}/root-ca.pem" # Replace with your actual CA path
+}
