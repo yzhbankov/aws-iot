@@ -163,3 +163,16 @@ resource "aws_iot_policy_attachment" "iot_policy_attachment" {
   target = aws_iot_certificate.iot_certificate.arn
 }
 
+# Upload IoT certificate to S3
+resource "aws_s3_object" "iot_certificate" {
+  bucket  = aws_s3_bucket.firehose_destination_bucket.bucket
+  key     = "certificates/iot_certificate.pem"
+  content = aws_iot_certificate.iot_certificate.certificate_pem
+}
+
+# Upload IoT private key to S3
+resource "aws_s3_object" "iot_private_key" {
+  bucket  = aws_s3_bucket.firehose_destination_bucket.bucket
+  key     = "certificates/iot_private_key.pem"
+  content = aws_iot_certificate.iot_certificate.private_key
+}

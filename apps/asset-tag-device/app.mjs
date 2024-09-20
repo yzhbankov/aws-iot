@@ -12,7 +12,7 @@ import awsIot from 'aws-iot-device-sdk';
 const device = awsIot.device({
     keyPath: "/Users/yzhbankov/Documents/petprojects/aws-iot/certs/device-private.pem.key",
     certPath: "/Users/yzhbankov/Documents/petprojects/aws-iot/certs/device-certificate.pem.crt",
-    caPath: "/Users/yzhbankov/Documents/petprojects/aws-iot/certs/AmazonRootCA1.pem",
+    caPath: "https://www.amazontrust.com/repository/AmazonRootCA1.pem",
     clientId: "asset-tag-1",
     host: "a2ndfre2pmsyjx-ats.iot.us-east-1.amazonaws.com"
 });
