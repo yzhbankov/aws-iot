@@ -3,7 +3,6 @@ locals {
   lambda_timeout = 60
 }
 
-# Users LAMBDA
 resource "null_resource" "install_kinesis_lambda_dependencies" {
   provisioner "local-exec" {
     command = "cd ${local.kinesis-lambda} && npm install"
@@ -38,7 +37,6 @@ resource "aws_lambda_function" "firehose_transform_lambda" {
   }
 }
 
-# IAM Role for Lambda function
 resource "aws_iam_role" "lambda_execution_role" {
   name = "lambda-execution-role"
 
