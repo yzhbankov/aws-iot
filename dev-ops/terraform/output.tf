@@ -7,13 +7,16 @@ output "iot_certificate_pem" {
 }
 
 output "iot_certificate_arn" {
-  value = aws_iot_certificate.iot_certificate.arn
+  value     = aws_iot_certificate.iot_certificate.arn
+  sensitive = true
 }
 
 output "iot_private_key" {
-  value = aws_iot_certificate.iot_certificate.private_key
+  value     = aws_iot_certificate.iot_certificate.private_key
+  sensitive = true
 }
 
 output "iot_public_key" {
-  value = aws_iot_certificate.iot_certificate.public_key
+  value     = aws_iot_certificate.iot_certificate.public_key
+  sensitive = true
 }
