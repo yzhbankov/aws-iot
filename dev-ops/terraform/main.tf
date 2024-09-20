@@ -11,7 +11,7 @@ resource "aws_kinesis_firehose_delivery_stream" "firehose_stream" {
     role_arn           = aws_iam_role.firehose_delivery_role.arn
     bucket_arn         = aws_s3_bucket.firehose_destination_bucket.arn
     buffering_size     = 5
-    buffering_interval = 300
+    buffering_interval = 60
 
     cloudwatch_logging_options {
       enabled         = true
@@ -51,7 +51,7 @@ resource "aws_iam_role" "firehose_delivery_role" {
 
   # Inline policy to add S3 and Lambda permissions
   inline_policy {
-    name = "firehose-s3-lambda-policy"
+    name = "${terraform.workspace}-yz-firehose-s3-lambda-policy"
 
     policy = jsonencode({
       Version = "2012-10-17",
