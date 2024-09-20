@@ -3,7 +3,8 @@ output "aws_region" {
 }
 
 output "iot_certificate_pem" {
-  value = aws_iot_certificate.iot_certificate.certificate_pem
+  value     = aws_iot_certificate.iot_certificate.certificate_pem
+  sensitive = true
 }
 
 output "iot_certificate_arn" {
