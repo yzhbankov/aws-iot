@@ -10,10 +10,10 @@ import awsIot from 'aws-iot-device-sdk';
 // connection will be terminated.
 //
 const device = awsIot.device({
-    keyPath: "/Users/yzhbankov/Documents/petprojects/aws-iot/certs/device-private.pem.key",
-    certPath: "/Users/yzhbankov/Documents/petprojects/aws-iot/certs/device-certificate.pem.crt",
-    caPath: "https://www.amazontrust.com/repository/AmazonRootCA1.pem",
-    clientId: "asset-tag-1",
+    keyPath: "/Users/yzhbankov/Documents/petprojects/aws-iot/certs/iot_private_key.pem",
+    certPath: "/Users/yzhbankov/Documents/petprojects/aws-iot/certs/iot_certificate.pem",
+    caPath: "/Users/yzhbankov/Documents/petprojects/aws-iot/certs/AmazonRootCA1.pem",
+    clientId: "prod-yz-iot-thing",
     host: "a2ndfre2pmsyjx-ats.iot.us-east-1.amazonaws.com"
 });
 
@@ -28,7 +28,7 @@ device
         device.subscribe('topic_1');
         setInterval(() => {
             i += 1;
-            device.publish('topic_2', JSON.stringify({device_id: 1, x: 0, y: 0, z: 0, location: 1, cnt: i}));
+            device.publish('topic_2', JSON.stringify({device_id: 1, x: 0, y: 0, z: 0, location: 1, cnt: i, now: new Date().toISOString()}));
             console.log('publish ', i);
         }, 500);
 
