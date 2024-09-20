@@ -126,3 +126,40 @@ resource "aws_iam_role_policy_attachment" "firehose_lambda_policy" {
   role       = aws_iam_role.firehose_delivery_role.name
   policy_arn = aws_iam_policy.custom_lambda_policy.arn
 }
+
+# IoT Thing
+resource "aws_iot_thing" "iot_thing" {
+  name = "${terraform.workspace}-yz-iot-thing"
+}
+
+# IoT Thing Certificate
+resource "aws_iot_certificate" "iot_certificate" {
+  active = true
+}
+
+# Attach Certificate to the IoT Thing
+resource "aws_iot_thing_principal_attachment" "iot_thing_certificate_attachment" {
+  thing     = aws_iot_thing.iot_thing.name
+  principal = aws_iot_certificate.iot_certificate.arn
+}
+
+# IoT Policy
+resource "aws_iot_policy" "iot_policy" {
+  name = "${terraform.workspace}-yz-iot-policy"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect   = "Allow",
+      Action   = "*",
+      Resource = "*"
+    }]
+  })
+}
+
+# Attach IoT Policy to Certificate
+resource "aws_iot_policy_attachment" "iot_policy_attachment" {
+  policy = aws_iot_policy.iot_policy.name
+  target = aws_iot_certificate.iot_certificate.arn
+}
+
