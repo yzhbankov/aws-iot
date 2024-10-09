@@ -10,9 +10,9 @@ import awsIot from 'aws-iot-device-sdk';
 // connection will be terminated.
 //
 const device = awsIot.device({
-    keyPath: "/Users/yzhbankov/Documents/petprojects/aws-iot/certs/iot_private_key.pem",
-    certPath: "/Users/yzhbankov/Documents/petprojects/aws-iot/certs/iot_certificate.pem",
-    caPath: "/Users/yzhbankov/Documents/petprojects/aws-iot/certs/AmazonRootCA1.pem",
+    keyPath: "/Users/yzhbankov/Documents/petprojects/aws-iot/certs/bf63e8aec4c513545b98b6a03db94187714cb218835d5b8e78c9fffcf43fbfd4-private.pem.key",
+    certPath: "/Users/yzhbankov/Documents/petprojects/aws-iot/certs/bf63e8aec4c513545b98b6a03db94187714cb218835d5b8e78c9fffcf43fbfd4-certificate.pem.crt",
+    caPath: "/Users/yzhbankov/Documents/petprojects/aws-iot/certs/AmazonRootCA1 (1).pem",
     clientId: "prod-yz-iot-thing",
     host: "a2ndfre2pmsyjx-ats.iot.us-east-1.amazonaws.com"
 });
@@ -38,3 +38,19 @@ device
     .on('message', function (topic, payload) {
         console.log('message', topic, payload.toString());
     });
+
+device.on('error', function (error) {
+    console.error('Error:', error);
+});
+
+device.on('close', function () {
+    console.log('Connection closed');
+});
+
+device.on('reconnect', function () {
+    console.log('Reconnecting');
+});
+
+device.on('offline', function () {
+    console.log('Device is offline');
+});

@@ -89,7 +89,7 @@ resource "aws_iam_role" "firehose_delivery_role" {
 # IoT Core Rule
 resource "aws_iot_topic_rule" "iot_to_firehose_rule" {
   name        = "IoTToFirehoseRule"
-  sql         = "SELECT * FROM '#'"
+  sql         = "SELECT * FROM 'topic_2'"
   sql_version = "2016-03-23"
   enabled     = true
 
@@ -150,9 +150,14 @@ resource "aws_iot_policy" "iot_policy" {
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
-      Effect   = "Allow",
-      Action   = "*",
-      Resource = "*"
+      "Effect": "Allow",
+      "Action": [
+        "iot:Connect",
+        "iot:Publish",
+        "iot:Subscribe",
+        "iot:Receive"
+      ],
+      "Resource": "*"
     }]
   })
 }
