@@ -34,7 +34,6 @@ resource "aws_kinesis_firehose_delivery_stream" "firehose_stream" {
       }
     }
 
-    s3_backup_mode = "Enabled"
   }
 }
 
