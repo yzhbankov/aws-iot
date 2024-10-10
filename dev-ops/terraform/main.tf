@@ -7,6 +7,8 @@ resource "aws_kinesis_firehose_delivery_stream" "firehose_stream" {
   name        = "${terraform.workspace}-yz-firehose-stream"
   destination = "extended_s3"
 
+  depends_on = [aws_iam_role.firehose_delivery_role] # Explicitly depend on IAM role
+
   extended_s3_configuration {
     role_arn           = aws_iam_role.firehose_delivery_role.arn
     bucket_arn         = aws_s3_bucket.firehose_destination_bucket.arn
@@ -15,8 +17,8 @@ resource "aws_kinesis_firehose_delivery_stream" "firehose_stream" {
 
     cloudwatch_logging_options {
       enabled         = true
-      log_group_name  = "/aws/kinesisfirehose/firehose-stream"
-      log_stream_name = "S3Delivery"
+      log_group_name  = "/aws/kinesisfirehose/${terraform.workspace}-yz-firehose-stream"
+      log_stream_name = "DestinationDelivery"
     }
 
     processing_configuration {
@@ -31,8 +33,10 @@ resource "aws_kinesis_firehose_delivery_stream" "firehose_stream" {
         }
       }
     }
+
   }
 }
+
 
 # IAM Role for Kinesis Firehose to access S3 and Lambda
 resource "aws_iam_role" "firehose_delivery_role" {
@@ -151,7 +155,7 @@ resource "aws_iam_role" "firehose_delivery_role" {
             "logs:PutLogEvents"
           ],
           "Resource" : [
-            "arn:aws:logs:us-east-1:968600019916:log-group:/aws/kinesisfirehose/PUT-S3-t8RP4:log-stream:*",
+            "arn:aws:logs:us-east-1:968600019916:log-group:/aws/kinesisfirehose/${terraform.workspace}-yz-firehose-stream:*",
             "arn:aws:logs:us-east-1:968600019916:log-group:%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%:log-stream:*"
           ]
         },
@@ -231,17 +235,6 @@ resource "aws_iam_role" "iot_kinesis_role" {
       }]
     })
   }
-}
-
-# Policy attachment for IoT Rule to access Firehose
-resource "aws_iam_role_policy_attachment" "iot_kinesis_policy" {
-  role       = aws_iam_role.iot_kinesis_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonKinesisFirehoseFullAccess"
-}
-
-resource "aws_iam_role_policy_attachment" "firehose_lambda_policy" {
-  role       = aws_iam_role.firehose_delivery_role.name
-  policy_arn = aws_iam_policy.custom_lambda_policy.arn
 }
 
 # IoT Thing
