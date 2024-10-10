@@ -35,12 +35,6 @@ resource "aws_kinesis_firehose_delivery_stream" "firehose_stream" {
     }
 
     s3_backup_mode = "Enabled"
-
-    cloudwatch_logging_options {
-      enabled         = true
-      log_group_name  = "/aws/kinesisfirehose/${terraform.workspace}-yz-firehose-stream"
-      log_stream_name = "BackupDelivery"
-    }
   }
 }
 
