@@ -207,18 +207,30 @@ resource "aws_iam_role" "iot_kinesis_role" {
   name = "${terraform.workspace}-yz-iot-kinesis-role"
 
   assume_role_policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Effect" : "Allow",
-        "Action" : [
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Principal = {
+        Service = "iot.amazonaws.com"
+      },
+      Action = "sts:AssumeRole"
+    }]
+  })
+
+  inline_policy {
+    name = "${terraform.workspace}-iot-kinesis-permissions"
+    policy = jsonencode({
+      Version = "2012-10-17",
+      Statement = [{
+        Effect = "Allow",
+        Action = [
           "firehose:PutRecord",
           "firehose:PutRecordBatch"
         ],
-        "Resource" : aws_kinesis_firehose_delivery_stream.firehose_stream.arn
-      }
-    ]
-  })
+        Resource = aws_kinesis_firehose_delivery_stream.firehose_stream.arn
+      }]
+    })
+  }
 }
 
 # Policy attachment for IoT Rule to access Firehose
