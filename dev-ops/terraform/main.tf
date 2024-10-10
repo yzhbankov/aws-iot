@@ -15,7 +15,7 @@ resource "aws_kinesis_firehose_delivery_stream" "firehose_stream" {
 
     cloudwatch_logging_options {
       enabled         = true
-      log_group_name  = "/aws/kinesisfirehose/${aws_kinesis_firehose_delivery_stream.firehose_stream.name}"
+      log_group_name  = "/aws/kinesisfirehose/${terraform.workspace}-yz-firehose-stream"
       log_stream_name = "DestinationDelivery"
     }
 
@@ -36,7 +36,7 @@ resource "aws_kinesis_firehose_delivery_stream" "firehose_stream" {
 
     cloudwatch_logging_options {
       enabled         = true
-      log_group_name  = "/aws/kinesisfirehose/${aws_kinesis_firehose_delivery_stream.firehose_stream.name}"
+      log_group_name  = "/aws/kinesisfirehose/${terraform.workspace}-yz-firehose-stream"
       log_stream_name = "BackupDelivery"
     }
   }
