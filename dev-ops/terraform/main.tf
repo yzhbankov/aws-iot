@@ -110,8 +110,8 @@ resource "aws_iam_role" "firehose_delivery_role" {
             "s3:PutObject"
           ],
           "Resource" : [
-            "arn:aws:s3:::prod-yz-iot-destination",
-            "arn:aws:s3:::prod-yz-iot-destination/*"
+            aws_s3_bucket.firehose_destination_bucket.arn,
+            "${aws_s3_bucket.firehose_destination_bucket.arn}/*"
           ]
         },
         {
@@ -121,7 +121,7 @@ resource "aws_iam_role" "firehose_delivery_role" {
             "lambda:InvokeFunction",
             "lambda:GetFunctionConfiguration"
           ],
-          "Resource" : "arn:aws:lambda:us-east-1:968600019916:function:prod-yz-kinesis-lambda:$LATEST"
+          "Resource" : "${aws_lambda_function.firehose_transform_lambda.arn}:$LATEST"
         },
         {
           "Effect" : "Allow",
