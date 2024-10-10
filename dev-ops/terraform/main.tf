@@ -162,7 +162,7 @@ resource "aws_iam_role" "firehose_delivery_role" {
             "logs:PutLogEvents"
           ],
           "Resource" : [
-            "arn:aws:logs:us-east-1:968600019916:log-group:/aws/kinesisfirehose/${aws_kinesis_firehose_delivery_stream.firehose_stream.name}:*",
+            "arn:aws:logs:us-east-1:968600019916:log-group:/aws/kinesisfirehose/${terraform.workspace}-yz-firehose-stream:*",
             "arn:aws:logs:us-east-1:968600019916:log-group:%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%:log-stream:*"
           ]
         },
