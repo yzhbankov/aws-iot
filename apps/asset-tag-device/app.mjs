@@ -10,8 +10,8 @@ import awsIot from 'aws-iot-device-sdk';
 // connection will be terminated.
 //
 const device = awsIot.device({
-    keyPath: "/Users/yzhbankov/Documents/petprojects/aws-iot/certs/bf63e8aec4c513545b98b6a03db94187714cb218835d5b8e78c9fffcf43fbfd4-private.pem.key",
-    certPath: "/Users/yzhbankov/Documents/petprojects/aws-iot/certs/bf63e8aec4c513545b98b6a03db94187714cb218835d5b8e78c9fffcf43fbfd4-certificate.pem.crt",
+    keyPath: "/Users/yzhbankov/Documents/petprojects/aws-iot/certs/iot_private_key (4).pem",
+    certPath: "/Users/yzhbankov/Documents/petprojects/aws-iot/certs/iot_certificate (4).pem",
     caPath: "/Users/yzhbankov/Documents/petprojects/aws-iot/certs/AmazonRootCA1 (1).pem",
     clientId: "prod-yz-iot-thing",
     host: "a2ndfre2pmsyjx-ats.iot.us-east-1.amazonaws.com"

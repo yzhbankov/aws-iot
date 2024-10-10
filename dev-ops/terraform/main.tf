@@ -11,7 +11,7 @@ resource "aws_kinesis_firehose_delivery_stream" "firehose_stream" {
     role_arn           = aws_iam_role.firehose_delivery_role.arn
     bucket_arn         = aws_s3_bucket.firehose_destination_bucket.arn
     buffering_size     = 5
-    buffering_interval = 60
+    buffering_interval = 300
 
     cloudwatch_logging_options {
       enabled         = true
@@ -49,17 +49,59 @@ resource "aws_iam_role" "firehose_delivery_role" {
     }]
   })
 
-  # Inline policy to add S3 and Lambda permissions
   inline_policy {
-    name = "${terraform.workspace}-yz-firehose-s3-lambda-policy"
+    name = "${terraform.workspace}-yz-firehose-policy"
 
     policy = jsonencode({
-      Version = "2012-10-17",
-      Statement = [
+      "Version" : "2012-10-17",
+      "Statement" : [
         {
-          Sid    = "",
-          Effect = "Allow",
-          Action = [
+          "Sid" : "",
+          "Effect" : "Allow",
+          "Action" : [
+            "glue:GetTable",
+            "glue:GetTableVersion",
+            "glue:GetTableVersions"
+          ],
+          "Resource" : [
+            "arn:aws:glue:us-east-1:968600019916:catalog",
+            "arn:aws:glue:us-east-1:968600019916:database/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%",
+            "arn:aws:glue:us-east-1:968600019916:table/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%"
+          ]
+        },
+        {
+          "Sid" : "",
+          "Effect" : "Allow",
+          "Action" : [
+            "kafka:GetBootstrapBrokers",
+            "kafka:DescribeCluster",
+            "kafka:DescribeClusterV2",
+            "kafka-cluster:Connect"
+          ],
+          "Resource" : "arn:aws:kafka:us-east-1:968600019916:cluster/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%"
+        },
+        {
+          "Sid" : "",
+          "Effect" : "Allow",
+          "Action" : [
+            "kafka-cluster:DescribeTopic",
+            "kafka-cluster:DescribeTopicDynamicConfiguration",
+            "kafka-cluster:ReadData"
+          ],
+          "Resource" : "arn:aws:kafka:us-east-1:968600019916:topic/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%"
+        },
+        {
+          "Sid" : "",
+          "Effect" : "Allow",
+          "Action" : [
+            "kafka-cluster:DescribeGroup"
+          ],
+          "Resource" : "arn:aws:kafka:us-east-1:968600019916:group/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%/*"
+        },
+        {
+          "Sid" : "",
+          "Effect" : "Allow",
+          "Action" : [
             "s3:AbortMultipartUpload",
             "s3:GetBucketLocation",
             "s3:GetObject",
@@ -67,19 +109,79 @@ resource "aws_iam_role" "firehose_delivery_role" {
             "s3:ListBucketMultipartUploads",
             "s3:PutObject"
           ],
-          Resource = [
-            aws_s3_bucket.firehose_destination_bucket.arn,
-            "${aws_s3_bucket.firehose_destination_bucket.arn}/*"
+          "Resource" : [
+            "arn:aws:s3:::prod-yz-iot-destination",
+            "arn:aws:s3:::prod-yz-iot-destination/*"
           ]
         },
         {
-          Sid    = "",
-          Effect = "Allow",
-          Action = [
+          "Sid" : "",
+          "Effect" : "Allow",
+          "Action" : [
             "lambda:InvokeFunction",
             "lambda:GetFunctionConfiguration"
           ],
-          Resource = "${aws_lambda_function.firehose_transform_lambda.arn}:$LATEST"
+          "Resource" : "arn:aws:lambda:us-east-1:968600019916:function:prod-yz-kinesis-lambda:$LATEST"
+        },
+        {
+          "Effect" : "Allow",
+          "Action" : [
+            "kms:GenerateDataKey",
+            "kms:Decrypt"
+          ],
+          "Resource" : [
+            "arn:aws:kms:us-east-1:968600019916:key/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%"
+          ],
+          "Condition" : {
+            "StringEquals" : {
+              "kms:ViaService" : "s3.us-east-1.amazonaws.com"
+            },
+            "StringLike" : {
+              "kms:EncryptionContext:aws:s3:arn" : [
+                "arn:aws:s3:::%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%/*",
+                "arn:aws:s3:::%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%"
+              ]
+            }
+          }
+        },
+        {
+          "Sid" : "",
+          "Effect" : "Allow",
+          "Action" : [
+            "logs:PutLogEvents"
+          ],
+          "Resource" : [
+            "arn:aws:logs:us-east-1:968600019916:log-group:/aws/kinesisfirehose/PUT-S3-t8RP4:log-stream:*",
+            "arn:aws:logs:us-east-1:968600019916:log-group:%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%:log-stream:*"
+          ]
+        },
+        {
+          "Sid" : "",
+          "Effect" : "Allow",
+          "Action" : [
+            "kinesis:DescribeStream",
+            "kinesis:GetShardIterator",
+            "kinesis:GetRecords",
+            "kinesis:ListShards"
+          ],
+          "Resource" : "arn:aws:kinesis:us-east-1:968600019916:stream/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%"
+        },
+        {
+          "Effect" : "Allow",
+          "Action" : [
+            "kms:Decrypt"
+          ],
+          "Resource" : [
+            "arn:aws:kms:us-east-1:968600019916:key/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%"
+          ],
+          "Condition" : {
+            "StringEquals" : {
+              "kms:ViaService" : "kinesis.us-east-1.amazonaws.com"
+            },
+            "StringLike" : {
+              "kms:EncryptionContext:aws:kinesis:arn" : "arn:aws:kinesis:us-east-1:968600019916:stream/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%"
+            }
+          }
         }
       ]
     })
@@ -105,14 +207,17 @@ resource "aws_iam_role" "iot_kinesis_role" {
   name = "${terraform.workspace}-yz-iot-kinesis-role"
 
   assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [{
-      Action = "sts:AssumeRole",
-      Effect = "Allow",
-      Principal = {
-        Service = "iot.amazonaws.com"
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "firehose:PutRecord",
+          "firehose:PutRecordBatch"
+        ],
+        "Resource" : aws_kinesis_firehose_delivery_stream.firehose_stream.arn
       }
-    }]
+    ]
   })
 }
 
