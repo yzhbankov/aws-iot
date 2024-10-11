@@ -37,6 +37,24 @@ resource "aws_kinesis_firehose_delivery_stream" "firehose_stream" {
   }
 }
 
+# CloudWatch Log Group for Firehose
+resource "aws_cloudwatch_log_group" "firehose_log_group" {
+  name = "/aws/kinesisfirehose/${terraform.workspace}-yz-firehose-stream"
+
+  retention_in_days = 14 # You can specify the log retention period here
+}
+
+# Log Stream for DestinationDelivery
+resource "aws_cloudwatch_log_stream" "destination_delivery_log_stream" {
+  name           = "DestinationDelivery"
+  log_group_name = aws_cloudwatch_log_group.firehose_log_group.name
+}
+
+# Log Stream for BackupDelivery
+resource "aws_cloudwatch_log_stream" "backup_delivery_log_stream" {
+  name           = "BackupDelivery"
+  log_group_name = aws_cloudwatch_log_group.firehose_log_group.name
+}
 
 # IAM Role for Kinesis Firehose to access S3 and Lambda
 resource "aws_iam_role" "firehose_delivery_role" {
@@ -155,7 +173,7 @@ resource "aws_iam_role" "firehose_delivery_role" {
             "logs:PutLogEvents"
           ],
           "Resource" : [
-            "arn:aws:logs:us-east-1:968600019916:log-group:/aws/kinesisfirehose/${terraform.workspace}-yz-firehose-stream:*",
+            "arn:aws:logs:us-east-1:968600019916:log-group:/aws/kinesisfirehose/${terraform.workspace}-yz-firehose-stream:log-stream:*",
             "arn:aws:logs:us-east-1:968600019916:log-group:%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%:log-stream:*"
           ]
         },
