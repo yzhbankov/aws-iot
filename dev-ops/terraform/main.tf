@@ -42,41 +42,49 @@ resource "aws_iam_role" "firehose_delivery_role" {
       }
     }]
   })
+}
 
-  inline_policy {
-    name = "${terraform.workspace}-yz-firehose-policy"
+resource "aws_iam_policy" "firehose_policy" {
+  name = "${terraform.workspace}-yz-firehose-policy"
 
-    policy = jsonencode({
-      "Version" : "2012-10-17",
-      "Statement" : [
-        {
-          "Sid" : "",
-          "Effect" : "Allow",
-          "Action" : [
-            "s3:AbortMultipartUpload",
-            "s3:GetBucketLocation",
-            "s3:GetObject",
-            "s3:ListBucket",
-            "s3:ListBucketMultipartUploads",
-            "s3:PutObject"
-          ],
-          "Resource" : [
-            aws_s3_bucket.firehose_destination_bucket.arn,
-            "${aws_s3_bucket.firehose_destination_bucket.arn}/*"
-          ]
-        },
-        {
-          "Sid" : "",
-          "Effect" : "Allow",
-          "Action" : [
-            "lambda:InvokeFunction",
-            "lambda:GetFunctionConfiguration"
-          ],
-          "Resource" : "${aws_lambda_function.firehose_transform_lambda.arn}:$LATEST"
-        }
-      ]
-    })
-  }
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "",
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:AbortMultipartUpload",
+          "s3:GetBucketLocation",
+          "s3:GetObject",
+          "s3:ListBucket",
+          "s3:ListBucketMultipartUploads",
+          "s3:PutObject"
+        ],
+        "Resource" : [
+          aws_s3_bucket.firehose_destination_bucket.arn,
+          "${aws_s3_bucket.firehose_destination_bucket.arn}/*"
+        ]
+      },
+      {
+        "Sid" : "",
+        "Effect" : "Allow",
+        "Action" : [
+          "lambda:InvokeFunction",
+          "lambda:GetFunctionConfiguration"
+        ],
+        "Resource" : [
+          aws_lambda_function.firehose_transform_lambda.arn,
+          "${aws_lambda_function.firehose_transform_lambda.arn}:$LATEST"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "firehose_policy_attachment" {
+  role       = aws_iam_role.firehose_delivery_role.name
+  policy_arn = aws_iam_policy.firehose_policy.arn
 }
 
 # IoT Core Rule
@@ -107,21 +115,27 @@ resource "aws_iam_role" "iot_kinesis_role" {
       Action = "sts:AssumeRole"
     }]
   })
+}
 
-  inline_policy {
-    name = "${terraform.workspace}-iot-kinesis-permissions"
-    policy = jsonencode({
-      Version = "2012-10-17",
-      Statement = [{
-        Effect = "Allow",
-        Action = [
-          "firehose:PutRecord",
-          "firehose:PutRecordBatch"
-        ],
-        Resource = aws_kinesis_firehose_delivery_stream.firehose_stream.arn
-      }]
-    })
-  }
+resource "aws_iam_policy" "iot_kinesis_policy" {
+  name = "${terraform.workspace}-iot-kinesis-permissions"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Action = [
+        "firehose:PutRecord",
+        "firehose:PutRecordBatch"
+      ],
+      Resource = aws_kinesis_firehose_delivery_stream.firehose_stream.arn
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "iot_kinesis_policy_attachment" {
+  role       = aws_iam_role.iot_kinesis_role.name
+  policy_arn = aws_iam_policy.iot_kinesis_policy.arn
 }
 
 # IoT Thing
