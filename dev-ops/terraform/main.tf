@@ -97,7 +97,7 @@ resource "aws_iot_topic_rule" "iot_to_firehose_rule" {
   firehose {
     delivery_stream_name = aws_kinesis_firehose_delivery_stream.firehose_stream.name
     role_arn             = aws_iam_role.iot_kinesis_role.arn
-    batch_mode           = true
+    batch_mode           = false
   }
 }
 
