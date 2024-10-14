@@ -13,12 +13,6 @@ resource "aws_kinesis_firehose_delivery_stream" "firehose_stream" {
     buffering_size     = 1
     buffering_interval = 60
 
-    cloudwatch_logging_options {
-      enabled         = true
-      log_group_name  = "/aws/kinesisfirehose/${terraform.workspace}-yz-firehose-stream"
-      log_stream_name = "DestinationDelivery"
-    }
-
     processing_configuration {
       enabled = true
 
@@ -31,27 +25,7 @@ resource "aws_kinesis_firehose_delivery_stream" "firehose_stream" {
         }
       }
     }
-
   }
-}
-
-# CloudWatch Log Group for Firehose
-resource "aws_cloudwatch_log_group" "firehose_log_group" {
-  name = "/aws/kinesisfirehose/${terraform.workspace}-yz-firehose-stream"
-
-  retention_in_days = 14 # You can specify the log retention period here
-}
-
-# Log Stream for DestinationDelivery
-resource "aws_cloudwatch_log_stream" "destination_delivery_log_stream" {
-  name           = "DestinationDelivery"
-  log_group_name = aws_cloudwatch_log_group.firehose_log_group.name
-}
-
-# Log Stream for BackupDelivery
-resource "aws_cloudwatch_log_stream" "backup_delivery_log_stream" {
-  name           = "BackupDelivery"
-  log_group_name = aws_cloudwatch_log_group.firehose_log_group.name
 }
 
 # IAM Role for Kinesis Firehose to access S3 and Lambda
@@ -79,49 +53,6 @@ resource "aws_iam_role" "firehose_delivery_role" {
           "Sid" : "",
           "Effect" : "Allow",
           "Action" : [
-            "glue:GetTable",
-            "glue:GetTableVersion",
-            "glue:GetTableVersions"
-          ],
-          "Resource" : [
-            "arn:aws:glue:us-east-1:968600019916:catalog",
-            "arn:aws:glue:us-east-1:968600019916:database/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%",
-            "arn:aws:glue:us-east-1:968600019916:table/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%"
-          ]
-        },
-        {
-          "Sid" : "",
-          "Effect" : "Allow",
-          "Action" : [
-            "kafka:GetBootstrapBrokers",
-            "kafka:DescribeCluster",
-            "kafka:DescribeClusterV2",
-            "kafka-cluster:Connect"
-          ],
-          "Resource" : "arn:aws:kafka:us-east-1:968600019916:cluster/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%"
-        },
-        {
-          "Sid" : "",
-          "Effect" : "Allow",
-          "Action" : [
-            "kafka-cluster:DescribeTopic",
-            "kafka-cluster:DescribeTopicDynamicConfiguration",
-            "kafka-cluster:ReadData"
-          ],
-          "Resource" : "arn:aws:kafka:us-east-1:968600019916:topic/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%"
-        },
-        {
-          "Sid" : "",
-          "Effect" : "Allow",
-          "Action" : [
-            "kafka-cluster:DescribeGroup"
-          ],
-          "Resource" : "arn:aws:kafka:us-east-1:968600019916:group/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%/*"
-        },
-        {
-          "Sid" : "",
-          "Effect" : "Allow",
-          "Action" : [
             "s3:AbortMultipartUpload",
             "s3:GetBucketLocation",
             "s3:GetObject",
@@ -142,66 +73,6 @@ resource "aws_iam_role" "firehose_delivery_role" {
             "lambda:GetFunctionConfiguration"
           ],
           "Resource" : "${aws_lambda_function.firehose_transform_lambda.arn}:$LATEST"
-        },
-        {
-          "Effect" : "Allow",
-          "Action" : [
-            "kms:GenerateDataKey",
-            "kms:Decrypt"
-          ],
-          "Resource" : [
-            "arn:aws:kms:us-east-1:968600019916:key/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%"
-          ],
-          "Condition" : {
-            "StringEquals" : {
-              "kms:ViaService" : "s3.us-east-1.amazonaws.com"
-            },
-            "StringLike" : {
-              "kms:EncryptionContext:aws:s3:arn" : [
-                "arn:aws:s3:::%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%/*",
-                "arn:aws:s3:::%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%"
-              ]
-            }
-          }
-        },
-        {
-          "Sid" : "",
-          "Effect" : "Allow",
-          "Action" : [
-            "logs:PutLogEvents"
-          ],
-          "Resource" : [
-            "arn:aws:logs:us-east-1:968600019916:log-group:/aws/kinesisfirehose/${terraform.workspace}-yz-firehose-stream:log-stream:*",
-            "arn:aws:logs:us-east-1:968600019916:log-group:%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%:log-stream:*"
-          ]
-        },
-        {
-          "Sid" : "",
-          "Effect" : "Allow",
-          "Action" : [
-            "kinesis:DescribeStream",
-            "kinesis:GetShardIterator",
-            "kinesis:GetRecords",
-            "kinesis:ListShards"
-          ],
-          "Resource" : "arn:aws:kinesis:us-east-1:968600019916:stream/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%"
-        },
-        {
-          "Effect" : "Allow",
-          "Action" : [
-            "kms:Decrypt"
-          ],
-          "Resource" : [
-            "arn:aws:kms:us-east-1:968600019916:key/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%"
-          ],
-          "Condition" : {
-            "StringEquals" : {
-              "kms:ViaService" : "kinesis.us-east-1.amazonaws.com"
-            },
-            "StringLike" : {
-              "kms:EncryptionContext:aws:kinesis:arn" : "arn:aws:kinesis:us-east-1:968600019916:stream/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%"
-            }
-          }
         }
       ]
     })
