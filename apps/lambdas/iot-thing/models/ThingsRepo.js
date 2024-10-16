@@ -23,7 +23,9 @@ export class ThingsRepo {
 
     async readByMac(macAddress) {
         const pkValue = getTableKey(THINGS, macAddress);
+        console.log('pkValue ', pkValue);
         const records = await this.repository.readByPk(pkValue);
+        console.log('records: ', records);
         return records.map(record => record['data']);
     }
 
