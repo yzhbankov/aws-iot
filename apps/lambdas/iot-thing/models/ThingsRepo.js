@@ -17,7 +17,10 @@ export class ThingsRepo {
 
     async save(data) {
         const pkValue = getTableKey(THINGS, data.macAddress);
-        const skValue = data.owner;
+        const skValue = data.locationId;
+        console.log('pkValue ', pkValue);
+        console.log('skValue ', skValue);
+        console.log('data ', data);
         return this.repository.save({ pkValue, skValue, data });
     }
 
