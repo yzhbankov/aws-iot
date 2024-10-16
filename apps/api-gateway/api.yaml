@@ -1,0 +1,117 @@
+openapi: 3.0.0
+paths:
+  "/api/v1/iot_thing":
+    post:
+      operationId: IotThingController_saveIotThing
+      summary: Create IoT thing
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/CreateIotThingDto"
+      responses:
+        '200':
+          description: Created IoT thing
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/IotThingEntity"
+        '403':
+          description: Forbidden.
+        '422':
+          description: Validation error.
+      tags:
+        - iot_things
+      security:
+        - bearer: []
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${iot_thing_lambda_arn}/invocations
+        httpMethod: POST
+        type: aws_proxy
+    get:
+      operationId: IotThingController_readIotThing
+      summary: Read IoT things
+      parameters: []
+      responses:
+        '200':
+          description: The found IoT things
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/IotThingEntity"
+      tags:
+        - iot_things
+      security:
+        - bearer: []
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${iot_thing_lambda_arn}/invocations
+        httpMethod: POST
+        type: aws_proxy
+  "/api/v1/iot_thing/{mac_address}":
+    delete:
+      operationId: IotThingController_deleteIotThing
+      summary: Delete IoT thing
+      parameters: []
+      responses:
+        '204':
+          description: Delete IoT thing
+        '403':
+          description: Forbidden.
+        '422':
+          description: Validation error.
+      tags:
+        - iot_things
+      security:
+        - bearer: []
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${iot_thing_lambda_arn}/invocations
+        httpMethod: POST
+        type: aws_proxy
+info:
+  title: IoT Things
+  description: The IoT API
+  version: '1.0'
+  contact: {}
+tags:
+  - name: iot_things
+    description: ''
+servers: []
+components:
+  schemas:
+    CreateIotThingDto:
+      type: object
+      properties:
+        macAddress:
+          type: string
+        locationId:
+          type: string
+      required:
+        - macAddress
+    IotThingEntity:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 642ff272f68f2b39a4a6f7df
+          description: IoT thing unique identifier
+        macAddress:
+          type: string
+          example: 00:00:00:00:00:00
+          description: Device MAC address
+        locationId:
+          type: string
+          example: 441fs272f48f3b39a4a6ff3a
+          description: Location unique identifier
+        createdAt:
+          type: string
+          example: '2023-01-02T12:00:00Z'
+          description: Date of IoT thing creation
+      required:
+        - _id
+        - macAddress
+        - locationId
+        - createdAt

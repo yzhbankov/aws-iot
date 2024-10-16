@@ -192,3 +192,25 @@ resource "aws_s3_object" "iot_private_key" {
   key     = "certificates/iot_private_key.pem"
   content = aws_iot_certificate.iot_certificate.private_key
 }
+
+# AWS Dynamo DB
+resource "aws_dynamodb_table" "iot_things_table" {
+  name         = "${terraform.workspace}_iot_things_table"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "PK"
+  range_key    = "SK"
+
+  attribute {
+    name = "PK"
+    type = "S"
+  }
+
+  attribute {
+    name = "SK"
+    type = "S"
+  }
+
+  tags = {
+    Name = "${terraform.workspace}_iot_things_table"
+  }
+}
