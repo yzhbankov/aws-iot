@@ -21,3 +21,12 @@ output "iot_public_key" {
   value     = aws_iot_certificate.iot_certificate.public_key
   sensitive = true
 }
+
+output "api_gateway_base_url" {
+  value = aws_api_gateway_deployment.deployment.invoke_url
+}
+
+output "dynamodb" {
+  value = aws_dynamodb_table.iot_things_table.name
+}
+
