@@ -6,3 +6,4 @@
 - Create Firehose adding Lambda and S3 with the roles
 - Create Iot Rule to send data to the Firehose
 - Create IAM for Rule which is allow PUT Record and PUT record batch 
+
