@@ -30,19 +30,18 @@ paths:
         uri: arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${iot_thing_lambda_arn}/invocations
         httpMethod: POST
         type: aws_proxy
+  "/api/v1/iot_thing/{mac_address}":
     get:
       operationId: IotThingController_readIotThing
-      summary: Read IoT things
-      parameters: []
+      summary: Read IoT thing by MAC address
+      parameters: [ ]
       responses:
         '200':
-          description: The found IoT things
+          description: Find IoT thing
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  "$ref": "#/components/schemas/IotThingEntity"
+                "$ref": "#/components/schemas/IotThingEntity"
       tags:
         - iot_things
       security:
@@ -51,7 +50,6 @@ paths:
         uri: arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${iot_thing_lambda_arn}/invocations
         httpMethod: POST
         type: aws_proxy
-  "/api/v1/iot_thing/{mac_address}":
     delete:
       operationId: IotThingController_deleteIotThing
       summary: Delete IoT thing
