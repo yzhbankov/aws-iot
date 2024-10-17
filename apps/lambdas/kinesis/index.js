@@ -1,5 +1,5 @@
-import { DatabaseClient } from './DatabaseClient';
-import { getTableKey, parseSafe } from './utils';
+import { DatabaseClient } from './DatabaseClient.js';
+import { getTableKey, parseSafe } from './utils.js';
 
 const entity = 'THINGS';
 const DYNAMODB_TABLE_NAME = 'prod_iot_things_table';
