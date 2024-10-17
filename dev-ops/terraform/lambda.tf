@@ -24,7 +24,7 @@ data "archive_file" "kinesis-lambda" {
 }
 
 resource "aws_lambda_function" "firehose_transform_lambda" {
-  function_name    = "${terraform.workspace}-yz-kinesis-lambda"
+  function_name    = "${terraform.workspace}-kinesis-lambda-yz"
   role             = aws_iam_role.kinesis_transform_lambda_role.arn
   filename         = data.archive_file.kinesis-lambda.output_path
   handler          = "index.handler"
@@ -40,7 +40,7 @@ resource "aws_lambda_function" "firehose_transform_lambda" {
 }
 
 resource "aws_iam_role" "kinesis_transform_lambda_role" {
-  name = "lambda-execution-role"
+  name = "kinesis_transform_lambda_role_yz"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -111,7 +111,7 @@ data "archive_file" "iot-thing-lambda" {
 }
 
 resource "aws_lambda_function" "iot-thing-lambda" {
-  function_name    = "${terraform.workspace}-iot-thing-lambda"
+  function_name    = "${terraform.workspace}-iot-thing-lambda-yz"
   role             = aws_iam_role.api_lambda_role.arn
   filename         = data.archive_file.iot-thing-lambda.output_path
   handler          = "index.handler"
@@ -137,7 +137,7 @@ data "aws_iam_policy_document" "assume_role" {
 }
 
 resource "aws_iam_role" "api_lambda_role" {
-  name               = "${terraform.workspace}_api_lambda_role"
+  name               = "${terraform.workspace}_api_lambda_role_yz"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
