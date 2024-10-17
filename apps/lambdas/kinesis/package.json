@@ -1,10 +1,12 @@
 {
-  "name": "extend-data-lambda",
+  "name": "kinesis-lambda",
   "type": "module",
   "description": "This package will be treated as an ES module.",
   "version": "1.0",
-  "main": "index.mjs",
+  "main": "index.js",
   "author": "yzhbankov",
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "aws-sdk": "^2.1573.0"
+  }
 }

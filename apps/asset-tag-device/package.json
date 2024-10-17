@@ -9,7 +9,7 @@
   },
   "type": "module",
   "scripts": {
-    "start": "node app.mjs",
+    "start": "node app.js",
     "reset": "yarn clean && yarn",
     "clean": "rimraf node_modules",
     "prep-build": "",

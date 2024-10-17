@@ -25,7 +25,7 @@ data "archive_file" "kinesis-lambda" {
 
 resource "aws_lambda_function" "firehose_transform_lambda" {
   function_name    = "${terraform.workspace}-yz-kinesis-lambda"
-  role             = aws_iam_role.lambda_execution_role.arn
+  role             = aws_iam_role.kinesis_transform_lambda_role.arn
   filename         = data.archive_file.kinesis-lambda.output_path
   handler          = "index.handler"
   source_code_hash = data.archive_file.kinesis-lambda.output_base64sha256
@@ -39,7 +39,7 @@ resource "aws_lambda_function" "firehose_transform_lambda" {
   }
 }
 
-resource "aws_iam_role" "lambda_execution_role" {
+resource "aws_iam_role" "kinesis_transform_lambda_role" {
   name = "lambda-execution-role"
 
   assume_role_policy = jsonencode({
@@ -82,8 +82,13 @@ resource "aws_iam_policy" "custom_lambda_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_policy_attachment" {
-  role       = aws_iam_role.lambda_execution_role.name
+  role       = aws_iam_role.kinesis_transform_lambda_role.name
   policy_arn = aws_iam_policy.custom_lambda_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "kinesis_lambda_dynamodb_role_policy" {
+  role       = aws_iam_role.kinesis_transform_lambda_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
 }
 
 # API Lambda Function
@@ -107,7 +112,7 @@ data "archive_file" "iot-thing-lambda" {
 
 resource "aws_lambda_function" "iot-thing-lambda" {
   function_name    = "${terraform.workspace}-iot-thing-lambda"
-  role             = aws_iam_role.iam_for_api_lambda.arn
+  role             = aws_iam_role.api_lambda_role.arn
   filename         = data.archive_file.iot-thing-lambda.output_path
   handler          = "index.handler"
   source_code_hash = data.archive_file.iot-thing-lambda.output_base64sha256
@@ -131,22 +136,22 @@ data "aws_iam_policy_document" "assume_role" {
   }
 }
 
-resource "aws_iam_role" "iam_for_api_lambda" {
-  name               = "${terraform.workspace}_iam_for_api_lambda"
+resource "aws_iam_role" "api_lambda_role" {
+  name               = "${terraform.workspace}_api_lambda_role"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_dynamodb_role_policy" {
-  role       = aws_iam_role.iam_for_api_lambda.name
+  role       = aws_iam_role.api_lambda_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_basic_execution_role_policy" {
-  role       = aws_iam_role.iam_for_api_lambda.name
+  role       = aws_iam_role.api_lambda_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_logs_role_policy" {
-  role       = aws_iam_role.iam_for_api_lambda.name
+  role       = aws_iam_role.api_lambda_role.name
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
 }
