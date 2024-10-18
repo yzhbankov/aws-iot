@@ -138,22 +138,6 @@ resource "aws_iam_role_policy_attachment" "iot_kinesis_policy_attachment" {
   policy_arn = aws_iam_policy.iot_kinesis_policy.arn
 }
 
-# IoT Thing
-resource "aws_iot_thing" "iot_thing" {
-  name = "${terraform.workspace}-yz-iot-thing"
-}
-
-# IoT Thing Certificate
-resource "aws_iot_certificate" "iot_certificate" {
-  active = true
-}
-
-# Attach Certificate to the IoT Thing
-resource "aws_iot_thing_principal_attachment" "iot_thing_certificate_attachment" {
-  thing     = aws_iot_thing.iot_thing.name
-  principal = aws_iot_certificate.iot_certificate.arn
-}
-
 # IoT Policy
 resource "aws_iot_policy" "iot_policy" {
   name = "${terraform.workspace}-yz-iot-policy"
@@ -171,26 +155,6 @@ resource "aws_iot_policy" "iot_policy" {
       "Resource" : "*"
     }]
   })
-}
-
-# Attach IoT Policy to Certificate
-resource "aws_iot_policy_attachment" "iot_policy_attachment" {
-  policy = aws_iot_policy.iot_policy.name
-  target = aws_iot_certificate.iot_certificate.arn
-}
-
-# Upload IoT certificate to S3
-resource "aws_s3_object" "iot_certificate" {
-  bucket  = aws_s3_bucket.firehose_destination_bucket.bucket
-  key     = "certificates/iot_certificate.pem"
-  content = aws_iot_certificate.iot_certificate.certificate_pem
-}
-
-# Upload IoT private key to S3
-resource "aws_s3_object" "iot_private_key" {
-  bucket  = aws_s3_bucket.firehose_destination_bucket.bucket
-  key     = "certificates/iot_private_key.pem"
-  content = aws_iot_certificate.iot_certificate.private_key
 }
 
 # AWS Dynamo DB
