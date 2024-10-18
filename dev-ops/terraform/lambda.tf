@@ -180,8 +180,7 @@ resource "aws_iam_policy" "iot_lambda_policy" {
   })
 }
 
-# Attach the custom IoT policy to the Lambda role
-resource "aws_iam_role_policy_attachment" "lambda_attach_iot_policy" {
+resource "aws_iam_role_policy_attachment" "lambda_iot_thing_policy" {
   role       = aws_iam_role.api_lambda_role.name
   policy_arn = aws_iam_policy.iot_lambda_policy.arn
 }
