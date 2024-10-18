@@ -121,7 +121,10 @@ resource "aws_lambda_function" "iot-thing-lambda" {
 
   environment {
     variables = {
-      ENVIRONMENT = terraform.workspace
+      ENVIRONMENT         = terraform.workspace
+      DYNAMODB_TABLE_NAME = aws_dynamodb_table.iot_things_table.name
+      AWS_REGION          = aws_region
+      POLICY_NAME         = aws_iot_policy.iot_policy.name
     }
   }
 }
@@ -154,4 +157,31 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution_role_policy" {
 resource "aws_iam_role_policy_attachment" "lambda_logs_role_policy" {
   role       = aws_iam_role.api_lambda_role.name
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
+}
+
+resource "aws_iam_policy" "iot_lambda_policy" {
+  name        = "LambdaIoTPermissions"
+  description = "Policy for Lambda to create IoT Thing, certificates, and attach policies"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "iot:CreateThing",
+          "iot:CreateKeysAndCertificate",
+          "iot:AttachThingPrincipal",
+          "iot:AttachPolicy"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+# Attach the custom IoT policy to the Lambda role
+resource "aws_iam_role_policy_attachment" "lambda_attach_iot_policy" {
+  role       = aws_iam_role.api_lambda_role.name
+  policy_arn = aws_iam_policy.iot_lambda_policy.arn
 }
