@@ -2,8 +2,7 @@ import { DatabaseClient, ThingsRepo } from './models/index.js';
 import { controller } from './system/index.js';
 import { Routers } from './routers/index.js';
 
-const DYNAMODB_TABLE_NAME = 'prod_iot_things_table';
-ThingsRepo.setRepository(new DatabaseClient(DYNAMODB_TABLE_NAME));
+ThingsRepo.setRepository(new DatabaseClient(process.env.DYNAMODB_TABLE_NAME));
 
 export const handler = async (event) => {
     try {
