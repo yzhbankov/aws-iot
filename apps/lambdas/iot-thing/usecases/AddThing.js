@@ -2,7 +2,7 @@ import { IoTClient, CreateThingCommand, CreateKeysAndCertificateCommand, AttachT
 import { ThingsRepo, ThingCreateDto, UnprocessableEntityError } from '../models/index.js';
 
 // Initialize AWS IoT and IoT DataPlane clients
-const iotClient = new IoTClient({ region: process.env.AWS_REGION });
+const iotClient = new IoTClient({ region: process.env.REGION });
 
 export class AddThing {
     async execute({ data }) {

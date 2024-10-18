@@ -123,7 +123,7 @@ resource "aws_lambda_function" "iot-thing-lambda" {
     variables = {
       ENVIRONMENT         = terraform.workspace
       DYNAMODB_TABLE_NAME = aws_dynamodb_table.iot_things_table.name
-      AWS_REGION          = var.AWS_REGION
+      REGION              = var.AWS_REGION
       POLICY_NAME         = aws_iot_policy.iot_policy.name
     }
   }
